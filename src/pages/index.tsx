@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '@/styles/Home.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-
 
 
 // Définition du type pour une tâche
@@ -24,9 +23,16 @@ export default function Home() {
   // Déclaration d'un état pour le texte de la tâche en cours de modification
   const [editingTaskText, setEditingTaskText] = useState<string>('');
 
+  // Compteur utilisateurs
+  const [visitCount, setVisitCount] = useState(0);
+
+  useEffect(() => {
+    setVisitCount(visitCount + 1);
+  }, []);
+
   // Fonction pour ajouter une nouvelle tâche
   const addTask = () => {
-    if (newTaskText.trim() !== '') {
+    if (newTaskText.trim() !== '' && tasks.length < 16) {
       const newTask: Task = {
         id: tasks.length + 1,
         text: newTaskText.trim(),
@@ -72,6 +78,18 @@ export default function Home() {
     setTasks(updatedTasks);
   };
 
+  // Fonction pour supprimer toutes les tâches
+  const deleteAllTasks = () => {
+    setTasks([]);
+  };
+
+  // Fonction pour gérer les pressions de touche dans l'input
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === 'Enter') {
+    addTask();
+  }
+};
+
   return (
     <>
       <Head>
@@ -82,14 +100,19 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         {/* Titre TODO LIST */}
-        <h1 className={styles.title}>TODO LIST</h1>
+        <h1 className={styles.title}>TO DO LIST</h1>
         {/* Barre de création de nouvelle tâche */}
         <div className={`${styles.centerContent} task-form-container`}>
-          <input type="text" value={newTaskText} onChange={handleNewTaskChange} placeholder="Entrez votre tâche ici..." />
+          <input 
+            type="text" 
+            value={newTaskText} 
+            onChange={handleNewTaskChange}
+            onKeyDown={handleKeyDown} // Gestionnaire d'événements pour les pressions de touche 
+            placeholder="Entrez votre tâche ici..." />
           <button onClick={addTask}>
             <FontAwesomeIcon icon={faPlus}style={{ width: '10px', height: '10px' }} />
           </button>
-
+           
        {/* Liste des tâches */}
 <ul style={{ listStyleType: 'none', padding: 0 }}>
   {tasks.map((task, index) => (
@@ -132,15 +155,18 @@ export default function Home() {
   ))}
 </ul>
 
-        </div>
-        <footer style={{ textAlign: 'center', marginTop: '60px' }}>
+        </div><br />
+        {/* Bouton pour supprimer toutes les tâches */}
+  <button onClick={deleteAllTasks}>Delete all</button>
+        <footer style={{ textAlign: 'center', marginTop: '60px', color: 'white' }}>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={100} height={100} />
           </a>
           <p>Visitez notre site web :</p>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             www.creativenumerik.com
-          </a>
+          </a><br />
+          <p>Users : {visitCount}</p>
         </footer>
       </main>
     </>

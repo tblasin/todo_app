@@ -15,17 +15,17 @@
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 29px;
   margin-bottom: 20px;
-  color: #f1f5f3;
+  color: #0c0c0c;
   font-family: fantasy;
   position: relative; /* Position relative pour utiliser z-index */
-  background-color: #808080ba;
+  background-color: #ffffff;
   background-size: cover;
   background-position: center;
   padding: 20px;
   border-radius: 10px;
-  width: 16%;
+  width: 15%;
   z-index: 1; /* Place l'image au-dessus des autres éléments */
   margin-top: 50px;
   padding-top: 30px;

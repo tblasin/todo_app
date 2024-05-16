@@ -42,7 +42,7 @@
 
 .task-form-container {
   position: relative; /* Position relative pour utiliser z-index */
-  background-color: #808080ba;
+  background-color: #ffffff;
   background-size: cover;
   background-position: center;
   padding: 20px;
@@ -99,7 +99,7 @@ body {
 }
 
 body {
-  color: white;
+  color: rgb(5, 5, 5);
 }
 
 a {
