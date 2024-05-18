@@ -17,7 +17,7 @@ export default function Home() {
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTaskText, setEditingTaskText] = useState<string>('');
-  const [formContainerHeight, setFormContainerHeight] = useState<string>('4rem');
+  const [formContainerHeight, setFormContainerHeight] = useState<string | null>('4rem');
   const [taskLimitReached, setTaskLimitReached] = useState<boolean>(false);
 
   // Effet pour mettre à jour les tâches et la hauteur du formulaire
