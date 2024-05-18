@@ -19,6 +19,8 @@ export default function Home() {
   const [formContainerHeight, setFormContainerHeight] = useState<string>('4rem');
   const [taskLimitReached, setTaskLimitReached] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.webp'); // L'image par défaut
+
 
   // Charge les tâches depuis le LocalStorage après le montage initial
   useEffect(() => {
@@ -132,11 +134,7 @@ export default function Home() {
   };
 
   // Affiche un message de chargement tant que les tâches ne sont pas chargées
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  return (
+  return isLoading ? <div>Loading...</div> : (
     <>
       {/* Entête de la page */}
       <Head>
@@ -145,8 +143,11 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <h1 className={styles.title}>TO DO LIST</h1>
+      <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
+        <h1 className={styles.title}>DONE</h1>
+
+          
+
         <div className={`${styles.centerContent} task-form-container`} style={{ height: formContainerHeight }}>
           {/* Champ de saisie pour ajouter une nouvelle tâche */}
           <input
@@ -213,15 +214,15 @@ export default function Home() {
           <FontAwesomeIcon icon={faTrash} style={{ width: '28px', height: '25px' }} viewBox="0 0 448 512" />
         </button>
         {/* Pied de page avec logo et liens */}
-        <footer style={{ textAlign: 'center', marginTop: '60px', color: 'white', fontSize: 'x-small' }}>
+        <footer style={{ textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
-            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={100} height={100} />
+            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={100} height={100} priority />
           </a>
           <p>Visitez notre site web :</p>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             www.creativenumerik.com
           </a><br />
-        </footer>
+       
         {/* Compteur de visiteurs */}
         <div className="compteurcontainer">
           <div className="compteur">
@@ -231,10 +232,23 @@ export default function Home() {
                 width='80'
                 height='18'
                 alt="compteur visiteurs"
+                fetchpriority={"low"}
               />
             </a>
           </div>
         </div>
+         {/* Affichage des petits carrés pour changer l'image de fond */}
+           <div className={styles.backgroundSelector}>
+          {['/images/backgrounds/boreal.webp', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.webp'].map((bg, index) => (
+            <div
+              key={index}
+              className={styles.backgroundOption}
+              style={{ backgroundImage: `url(${bg})` }}
+              onClick={() => setBackgroundImage(bg)}
+            ></div>
+          ))}
+        </div>
+        </footer>
       </main>
     </>
   );
