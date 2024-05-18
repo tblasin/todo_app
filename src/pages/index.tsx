@@ -232,7 +232,7 @@ export default function Home() {
                 width='80'
                 height='18'
                 alt="compteur visiteurs"
-                fetchpriority={"low"}
+                fetchPriority={"low"} 
               />
             </a>
           </div>
