@@ -11,13 +11,41 @@ type Task = {
 };
 
 export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // Initialise l'état des tâches à partir du LocalStorage ou d'une valeur par défaut
+  const initialTasks = typeof window !== 'undefined' && localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
+  const [tasks, setTasks] = useState<Task[]>([initialTasks]);
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTaskText, setEditingTaskText] = useState<string>('');
   const [formContainerHeight, setFormContainerHeight] = useState<string>('4rem');
   const [taskLimitReached, setTaskLimitReached] = useState<boolean>(false);
 
+  // Effet pour mettre à jour les tâches et la hauteur du formulaire
+  useEffect(() => {
+    const storedTasks = localStorage.getItem('tasks');
+    const parsedTasks = storedTasks ? JSON.parse(storedTasks) : [];
+    setTasks(parsedTasks);
+    const newHeight = `${4 + parsedTasks.length * 2}rem`;
+    if (parsedTasks.length === 15) {
+      setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
+      setTaskLimitReached(true);
+    } else {
+      setFormContainerHeight(newHeight);
+    }
+  }, []);
+
+  // Effet pour mettre à jour la hauteur du formulaire lorsque les tâches changent
+  useEffect(() => {
+    const newHeight = `${4 + tasks.length * 2}rem`;
+    if (tasks.length === 15) {
+      setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
+      setTaskLimitReached(true);
+    } else {
+      setFormContainerHeight(newHeight);
+    }
+  }, [tasks]);
+  
+  // Fonction pour ajouter une tâche
   const addTask = () => {
     if (newTaskText.trim() !== '' && tasks.length < 15) {
       const newTask: Task = {
@@ -29,7 +57,6 @@ export default function Home() {
       setNewTaskText('');
       const newHeight = `${4 + updatedTasks.length * 2}rem`;
       if (updatedTasks.length === 15) {
-        // Ajouter une ligne supplémentaire si le nombre maximum de tâches est atteint
         setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
         setTaskLimitReached(true);
       } else {
@@ -38,15 +65,18 @@ export default function Home() {
     }
   };
 
+  // Fonction pour gérer le changement de texte pour une nouvelle tâche
   const handleNewTaskChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTaskText(e.target.value);
   };
 
+  // Fonction pour éditer une tâche
   const editTask = (id: number, text: string) => {
     setEditingTaskId(id);
     setEditingTaskText(text);
   };
 
+  // Fonction pour sauvegarder une tâche éditée
   const saveEditedTask = () => {
     const updatedTasks = tasks.map(task => {
       if (task.id === editingTaskId) {
@@ -59,31 +89,33 @@ export default function Home() {
     setEditingTaskText('');
   };
 
+  // Fonction pour annuler l'édition d'une tâche
   const cancelEditTask = () => {
     setEditingTaskId(null);
     setEditingTaskText('');
   };
 
+  // Fonction pour supprimer une tâche
   const deleteTask = (id: number) => {
     const updatedTasks = tasks.filter(task => task.id !== id);
     setTasks(updatedTasks);
     const newHeight = `${4 + updatedTasks.length * 2}rem`;
-    // Réduire la hauteur si le nombre de tâches est inférieur à 15
     if (updatedTasks.length < 15) {
       setFormContainerHeight(newHeight);
       setTaskLimitReached(false);
     } else {
-      // Garder la hauteur inchangée si le nombre maximum de tâches est atteint
       setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
     }
   };
 
+  // Fonction pour supprimer toutes les tâches
   const deleteAllTasks = () => {
     setTasks([]);
     setFormContainerHeight('4rem');
     setTaskLimitReached(false);
   };
 
+  // Gestionnaire de touche pour ajouter une tâche en appuyant sur Entrée
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       addTask();
@@ -92,14 +124,19 @@ export default function Home() {
 
   return (
     <>
+      {/* Entête de la page */}
       <Head>
         <title>Todo-List App</title>
         <meta name="description" content="Todo-List App" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      {/* Contenu principal de la page */}
       <main className={styles.main}>
         <h1 className={styles.title}>TO DO LIST</h1>
+
+        {/* Formulaire pour ajouter une nouvelle tâche */}
         <div className={`${styles.centerContent} task-form-container`} style={{ height: formContainerHeight }}>
           <input
             type="text"
@@ -114,12 +151,14 @@ export default function Home() {
           </button>
           {taskLimitReached && <p style={{ color: 'red', marginTop: '10px' }}>Vous avez atteint le nombre maximum de tâches.</p>}
           
+          {/* Liste des tâches */}
           <ul style={{ listStyleType: 'none', padding: 0, marginTop: '10px' }}>
             {tasks.map((task, index) => (
               <li key={task.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <span style={{ marginRight: '8px' }}>{index + 1}</span>
                 {editingTaskId === task.id ? (
                   <>
+                    {/* Formulaire pour éditer une tâche */}
                     <input
                       type="text"
                       value={editingTaskText}
@@ -139,6 +178,7 @@ export default function Home() {
                   <>
                     <span>{task.text}</span>
                     <div>
+                      {/* Boutons pour éditer et supprimer une tâche */}
                       <button onClick={() => editTask(task.id, task.text)} style={{ marginRight: '10px' }}>
                         <FontAwesomeIcon icon={faEdit} style={{ width: '20px', height: '15px' }} viewBox="0 0 448 512" />
                       </button>
@@ -152,10 +192,15 @@ export default function Home() {
             ))}
           </ul>
         </div>
+        
         <br />
+        
+        {/* Bouton pour supprimer toutes les tâches */}
         <button onClick={deleteAllTasks}>
           <FontAwesomeIcon icon={faTrash} style={{ width: '28px', height: '25px' }} viewBox="0 0 448 512" />
         </button>
+        
+        {/* Pied de page */}
         <footer style={{ textAlign: 'center', marginTop: '60px', color: 'white', fontSize: 'x-small' }}>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={100} height={100} />
@@ -164,17 +209,21 @@ export default function Home() {
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             www.creativenumerik.com
           </a><br />
-        
         </footer>
+        
+        {/* Compteur de visites */}
         <div className="compteurcontainer">
-                        <div className="compteur"><a href="http://www.mon-compteur.fr">
-                           <Image 
-                              src="http://www.mon-compteur.fr/html_c02genv2-77655-1"
-                              width='80'
-                              height='18'
-                              alt="compteur visiteurs"/></a>
-            </div>
+          <div className="compteur">
+            <a href="http://www.mon-compteur.fr">
+              <Image 
+                src="http://www.mon-compteur.fr/html_c02genv2-77655-1"
+                width='80'
+                height='18'
+                alt="compteur visiteurs"
+              />
+            </a>
           </div>
+        </div>
       </main>
     </>
   );
