@@ -172,7 +172,6 @@ export default function Home() {
                               src="http://www.mon-compteur.fr/html_c02genv2-77655-1"
                               width='80'
                               height='18'
-                              border="0"
                               alt="compteur visiteurs"/></a>
             </div>
           </div>
