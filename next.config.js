@@ -9,6 +9,11 @@ module.exports = nextConfig
 
 module.exports = {
   images: {
-    domains: ['www.mon-compteur.fr'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'www.mon-compteur.fr',
+      },
+    ],
   },
-}
+};

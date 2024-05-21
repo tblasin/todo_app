@@ -1,17 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
-import styles from '@/styles/Home.module.css';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import styles from '@/styles/Home.module.css';
 
 type Task = {
   id: number;
   text: string;
 };
 
+// Composant pour la flèche de navigation suivante
+const SampleNextArrow = (props: any) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: 'block', background: 'black', borderRadius: '50%' }}
+      onClick={onClick}
+    />
+  );
+}
+
+// Composant pour la flèche de navigation précédente
+const SamplePrevArrow = (props: any) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: 'block', background: 'black', borderRadius: '50%' }}
+      onClick={onClick}
+    />
+  );
+}
+
 export default function Home() {
-  // Initialise l'état des tâches et le statut de chargement
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
@@ -19,8 +45,7 @@ export default function Home() {
   const [formContainerHeight, setFormContainerHeight] = useState<string>('4rem');
   const [taskLimitReached, setTaskLimitReached] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.webp'); // L'image par défaut
-
+  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.png');
 
   // Charge les tâches depuis le LocalStorage après le montage initial
   useEffect(() => {
@@ -34,7 +59,7 @@ export default function Home() {
     } else {
       setFormContainerHeight(newHeight);
     }
-    setIsLoading(false); // Indique que les tâches ont été chargées
+    setIsLoading(false);
   }, []);
 
   // Met à jour la hauteur du conteneur chaque fois que les tâches changent
@@ -65,7 +90,6 @@ export default function Home() {
       } else {
         setFormContainerHeight(newHeight);
       }
-      // Stocker les tâches mises à jour dans le LocalStorage
       localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     }
   };
@@ -92,7 +116,6 @@ export default function Home() {
     setTasks(updatedTasks);
     setEditingTaskId(null);
     setEditingTaskText('');
-    // Stocker les tâches mises à jour dans le LocalStorage
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
@@ -113,7 +136,6 @@ export default function Home() {
     } else {
       setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
     }
-    // Stocker les tâches mises à jour dans le LocalStorage
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
@@ -122,7 +144,6 @@ export default function Home() {
     setTasks([]);
     setFormContainerHeight('4rem');
     setTaskLimitReached(false);
-    // Supprimer les tâches du LocalStorage
     localStorage.removeItem('tasks');
   };
 
@@ -131,6 +152,17 @@ export default function Home() {
     if (e.key === 'Enter') {
       addTask();
     }
+  };
+
+  // Configuration du carousel
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />
   };
 
   // Affiche un message de chargement tant que les tâches ne sont pas chargées
@@ -145,8 +177,6 @@ export default function Home() {
       </Head>
       <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
         <h1 className={styles.title}>DONE</h1>
-
-          
 
         <div className={`${styles.centerContent} task-form-container`} style={{ height: formContainerHeight }}>
           {/* Champ de saisie pour ajouter une nouvelle tâche */}
@@ -213,41 +243,44 @@ export default function Home() {
         <button onClick={deleteAllTasks}>
           <FontAwesomeIcon icon={faTrash} style={{ width: '28px', height: '25px' }} viewBox="0 0 448 512" />
         </button>
+        
         {/* Pied de page avec logo et liens */}
         <footer style={{ textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
-            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={100} height={100} priority />
+            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} priority />
           </a>
           <p>Visitez notre site web :</p>
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             www.creativenumerik.com
           </a><br />
-       
-        {/* Compteur de visiteurs */}
-        <div className="compteurcontainer">
-          <div className="compteur">
-            <a href="http://www.mon-compteur.fr">
-              <Image 
-                src="http://www.mon-compteur.fr/html_c02genv2-77655-1"
-                width='80'
-                height='18'
-                alt="compteur visiteurs"
-                fetchPriority={"low"} 
-              />
-            </a>
+          <div className="compteurcontainer">
+            <div className="compteur">
+              <a href="http://www.mon-compteur.fr">
+                <Image 
+                  src="http://www.mon-compteur.fr/html_c02genv2-77655-1"
+                  width='50'
+                  height='10'
+                  alt="compteur visiteurs"
+                  fetchPriority={"low"} 
+                />
+              </a>
+            </div>
           </div>
-        </div>
-         {/* Affichage des petits carrés pour changer l'image de fond */}
-           <div className={styles.backgroundSelector}>
-          {['/images/backgrounds/boreal.webp', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.webp'].map((bg, index) => (
-            <div
-              key={index}
-              className={styles.backgroundOption}
-              style={{ backgroundImage: `url(${bg})` }}
-              onClick={() => setBackgroundImage(bg)}
-            ></div>
-          ))}
-        </div>
+          
+          {/* Carousel pour changer l'image de fond */}
+          <div className={styles.carousel}>
+            <Slider {...settings}>
+              {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.jpeg'].map((bg, index) => (
+                <div key={index} className={styles.backgroundOptionContainer}>
+                  <div
+                    className={styles.backgroundOption}
+                    style={{ backgroundImage: `url(${bg})` }}
+                    onClick={() => setBackgroundImage(bg)}
+                  ></div>
+                </div>
+              ))}
+            </Slider>
+          </div>
         </footer>
       </main>
     </>
