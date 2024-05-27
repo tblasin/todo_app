@@ -45,18 +45,6 @@
   --card-border-rgb: 131, 134, 135;
 }
 
-.task-form-container {
-  position: relative; /* Position relative pour utiliser z-index */
-  background-color: #ffffff;
-  background-size: cover;
-  background-position: center;
-  box-shadow: 0 0 0 4px black;
-  padding: 20px;
-  border-radius: 10px;
-  height: 36rem;
-  z-index: 1; /* Place l'image au-dessus des autres éléments */
-  margin-top: 10px;
-}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -121,6 +109,7 @@ a {
   transform: translateY(3px); /* Déplace le logo de 3 pixels vers le bas */
 }
 
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
@@ -129,4 +118,13 @@ a {
 
 .compteurcontainer {
   margin-top: 10px;
+}
+
+.slick-dots {
+  display: none;
+}
+
+.slick-slide {
+  margin: auto; 
+  overflow: hidden; 
 }

@@ -31,12 +31,68 @@
   background-position: center;
   padding: 20px;
   width: 10%;
-  z-index: 1; /* Place l'image au-dessus des autres éléments */
-  margin-top: 50px;
+  z-index: 1; 
+  margin-top: 20px;
 }
 
 .title:hover {
   transform: scale(1.1); /* Effet de zoom sur le survol */
+}
+
+.titleInput {
+  background-color: white;
+  border: 2px solid black;
+  padding: 5px;
+  text-align: center;
+  width: 80%;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.activeTitleInput {
+  background-color: rgb(255, 255, 255); /* Couleur de fond pour le titre actif */
+  transition: background-color 0.3s ease;
+  outline: 2px solid rgb(0, 255, 153); /* Couleur et épaisseur de l'outline pour le titre actif */
+  border: 2px solid rgb(0, 255, 225); /* Couleur et épaisseur de la bordure pour le titre actif */
+  transition: outline 0.3s ease, border 0.3s ease;
+
+}
+
+.inactiveTitleInput {
+  background-color: rgba(255, 255, 255, 0.2); /* Blanc avec 20% d'opacité */
+  transition: background-color 0.3s ease;
+}
+
+.clickableTitle, .activeList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 100%;
+}
+
+.centeredTitle {
+  text-align: center;
+  width: fit-content;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.taskButtons {
+  display: flex;
+  justify-content: space-between; /* Pour espacer les boutons */
+  margin-top: 10px; /* Pour ajouter de l'espace au-dessus des boutons */
+  margin-right: -5px;
+}
+
+.taskButtons button {
+  margin-right: 5px; /* Pour ajouter un espace entre les boutons */
 }
 
 .backgroundSelector {
@@ -46,8 +102,8 @@
 }
 
 .backgroundOption {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   background-size: cover;
   cursor: pointer;
   border: 2px solid #000000;
@@ -56,7 +112,7 @@
 }
 
 .backgroundOption:hover {
-  transform: scale(1.1);
+  transform: scale(0.7);
 }
 
 .center-content {
@@ -66,18 +122,39 @@
   margin-bottom: 20px; /* Ajoutez une marge en bas pour l'espace entre l'entrée et le bouton */
 }
 
-
-.task-list {
+.taskListContainer {
+  height: 4rem;
+  position: relative; 
+  background-color: #ffffff;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 0 4px black;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1; 
+  margin-top: 10px;
   list-style: none;
-  padding: 0;
+  overflow: hidden; /* Cache le débordement pour une transition fluide */
+  transition: max-height 0.3s ease-in-out; /* Ajoute une transition pour un effet fluide */
 }
 
-.task-item {
+.containerHeight {
+  height: 4rem;
+}
+
+.taskList {
+  list-style-type: none; /* Supprime les puces des éléments de la liste */
+  padding: 0; /* Supprime les marges intérieures par défaut */
+  margin: 0; /* Supprime les marges extérieures par défaut */
+}
+
+.taskItem {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
-  border-bottom: 1px solid #ccc;
+  align-items: center;
+  width: 104%;
 }
 
 .task-item input[type="text"] {
@@ -101,10 +178,8 @@
   background-color: #45a049;
 }
 
-.add-task-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
+.addTaskContainer {
+  margin-bottom: 1rem;
 }
 
 .add-task-container input[type="text"] {
@@ -128,25 +203,80 @@
   background-color: #656668;
 }
 
+.deleteButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.deleteButton {
+  background-color: #fdfdfd;
+    color: black;
+    border: 2px solid;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    margin-top: 30px;
+    width: 50px;
+    height: 50px;
+}
+
+.deleteButton:hover {
+  background-color: rgb(255, 0, 43);
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .carousel {
-  margin: 0 auto;
-  width: 20%;
+  margin-top: 20px;
+  width: 160px;
+  height: 60px;
+  position: relative;
 }
 
-.backgroundOptionContainer {
-  padding: 10px;
-}
-
-.backgroundOption {
-  width: 50px;
-  height: 50px;
-  background-size: cover;
+.nextArrow, .prevArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   cursor: pointer;
-  margin: 0 auto;
+  z-index: 2;
 }
 
-.slick-prev, .slick-next {
-  z-index: 1;
+.nextArrow {
+  right: -35px;
+  width: 20px;  
+  height: 20px;
+}
+
+.prevArrow {
+  left: -35px;
+  width: 20px;  
+  height: 20px; 
+}
+
+.nextArrow svg, .prevArrow svg {
+  font-size: 16px; /* Taille de l'icône de la flèche */
+  color: black;    /* Couleur de la flèche */
+}
+
+.prevArrow svg {
+  font-size: 20px; /* Taille personnalisée de l'icône de la flèche */
+}
+
+.slick-dots li button {
+  display: none;
 }
 
 /* Media queries pour les tailles d'écran spécifiques */

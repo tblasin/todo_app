@@ -1,162 +1,107 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-import styles from '@/styles/Home.module.css';
+import { faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
+import TaskList from '../../components/TaskList'; // Composant de liste de tâches
+import styles from '@/styles/Home.module.css'; // Fichier de styles CSS
 
+// Définition du type Task
 type Task = {
   id: number;
   text: string;
 };
 
-// Composant pour la flèche de navigation suivante
-const SampleNextArrow = (props: any) => {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: 'block', background: 'black', borderRadius: '50%' }}
-      onClick={onClick}
-    />
-  );
-}
+// Composant de flèche personnalisée pour le carrousel suivant
+const SampleNextArrow: React.FC<any> = ({ onClick }) => (
+  <div className={styles.nextArrow} onClick={onClick}>
+    <FontAwesomeIcon icon={faChevronRight} />
+  </div>
+);
 
-// Composant pour la flèche de navigation précédente
-const SamplePrevArrow = (props: any) => {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{ ...style, display: 'block', background: 'black', borderRadius: '50%' }}
-      onClick={onClick}
-    />
-  );
-}
+// Composant de flèche personnalisée pour le carrousel précédent
+const SamplePrevArrow: React.FC<any> = ({ onClick }) => (
+  <div className={styles.prevArrow} onClick={onClick}>
+    <FontAwesomeIcon icon={faChevronLeft} />
+  </div>
+);
 
+// Composant principal de l'application
 export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskText, setNewTaskText] = useState<string>('');
-  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
-  const [editingTaskText, setEditingTaskText] = useState<string>('');
-  const [formContainerHeight, setFormContainerHeight] = useState<string>('4rem');
+  const [activeList, setActiveList] = useState<number>(0); // État pour suivre la liste de tâches active
+  const [taskLists, setTaskLists] = useState<Array<{ title: string, tasks: Task[] }>>([
+    { title: 'Liste 1', tasks: [] },
+    { title: 'Liste 2', tasks: [] },
+    { title: 'Liste 3', tasks: [] },
+  ]);
   const [taskLimitReached, setTaskLimitReached] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.png');
+  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.png'); // Image de fond
+  const [containerHeight, setContainerHeight] = useState<number>(4);
 
-  // Charge les tâches depuis le LocalStorage après le montage initial
+
+  // Référence pour le conteneur de tâches
+  const taskContainerRef = useRef<HTMLDivElement>(null);
+
+  // Effet pour charger les données depuis le stockage local au chargement de la page
   useEffect(() => {
-    const storedTasks = localStorage.getItem('tasks');
-    const parsedTasks = storedTasks ? JSON.parse(storedTasks) : [];
-    setTasks(parsedTasks);
-    const newHeight = `${4 + parsedTasks.length * 2}rem`;
-    if (parsedTasks.length === 15) {
-      setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
-      setTaskLimitReached(true);
-    } else {
-      setFormContainerHeight(newHeight);
+    const storedTaskLists = localStorage.getItem('taskLists');
+    if (storedTaskLists) {
+      setTaskLists(JSON.parse(storedTaskLists));
     }
-    setIsLoading(false);
   }, []);
 
-  // Met à jour la hauteur du conteneur chaque fois que les tâches changent
+  // Effet pour sauvegarder les données dans le stockage local à chaque changement des listes de tâches
   useEffect(() => {
-    const newHeight = `${4 + tasks.length * 2}rem`;
-    if (tasks.length === 15) {
-      setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
-      setTaskLimitReached(true);
-    } else {
-      setFormContainerHeight(newHeight);
-    }
-  }, [tasks]);
+    localStorage.setItem('taskLists', JSON.stringify(taskLists));
+  }, [taskLists]);
 
-  // Ajoute une nouvelle tâche à la liste
-  const addTask = () => {
-    if (newTaskText.trim() !== '' && tasks.length < 15) {
-      const newTask: Task = {
-        id: tasks.length + 1,
-        text: newTaskText.trim(),
-      };
-      const updatedTasks = [...tasks, newTask];
-      setTasks(updatedTasks);
-      setNewTaskText('');
-      const newHeight = `${4 + updatedTasks.length * 2}rem`;
-      if (updatedTasks.length === 15) {
-        setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
-        setTaskLimitReached(true);
-      } else {
-        setFormContainerHeight(newHeight);
+  // Effet pour mettre à jour la hauteur du conteneur lors du redimensionnement de la fenêtre
+  useEffect(() => {
+    const handleResize = () => {
+      setContainerHeight(window.innerHeight);
+    };
+
+    if (typeof window !== 'undefined') {
+      setContainerHeight(window.innerHeight);
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
       }
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    }
+    };
+  }, []);
+
+  // Fonction pour gérer le changement de liste de tâches active lorsqu'un titre est cliqué
+  const handleListClick = (index: number) => {
+    setActiveList(index); // Mettre à jour l'état activeList avec l'index de la liste de tâches cliquée
   };
 
-  // Gère le changement de texte de la nouvelle tâche
-  const handleNewTaskChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTaskText(e.target.value);
+  // Fonction pour mettre à jour le titre d'une liste de tâches
+  const handleTitleChange = (index: number, newTitle: string) => {
+    const updatedTaskLists = taskLists.map((list, i) => i === index ? { ...list, title: newTitle } : list);
+    setTaskLists(updatedTaskLists);
   };
 
-  // Passe en mode édition pour une tâche
-  const editTask = (id: number, text: string) => {
-    setEditingTaskId(id);
-    setEditingTaskText(text);
+  // Fonction pour mettre à jour les tâches d'une liste de tâches
+  const handleTasksChange = (index: number, tasks: Task[]) => {
+    const updatedTaskLists = taskLists.map((list, i) => i === index ? { ...list, tasks } : list);
+    setTaskLists(updatedTaskLists);
   };
 
-  // Enregistre les modifications apportées à une tâche
-  const saveEditedTask = () => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === editingTaskId) {
-        return { ...task, text: editingTaskText };
-      }
-      return task;
-    });
-    setTasks(updatedTasks);
-    setEditingTaskId(null);
-    setEditingTaskText('');
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  };
-
-  // Annule le mode édition pour une tâche
-  const cancelEditTask = () => {
-    setEditingTaskId(null);
-    setEditingTaskText('');
-  };
-
-  // Supprime une tâche de la liste
-  const deleteTask = (id: number) => {
-    const updatedTasks = tasks.filter(task => task.id !== id);
-    setTasks(updatedTasks);
-    const newHeight = `${4 + updatedTasks.length * 2}rem`;
-    if (updatedTasks.length < 15) {
-      setFormContainerHeight(newHeight);
-      setTaskLimitReached(false);
-    } else {
-      setFormContainerHeight(`${parseFloat(newHeight) + 2}rem`);
-    }
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  };
-
-  // Supprime toutes les tâches de la liste
+  // Fonction pour supprimer toutes les tâches de la liste active
   const deleteAllTasks = () => {
-    setTasks([]);
-    setFormContainerHeight('4rem');
-    setTaskLimitReached(false);
-    localStorage.removeItem('tasks');
+    const updatedTaskLists = taskLists.map((list, i) => i === activeList ? { ...list, tasks: [] } : list);
+    setTaskLists(updatedTaskLists);
   };
 
-  // Gestionnaire de touche pour ajouter une tâche en appuyant sur Entrée
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      addTask();
-    }
-  };
-
-  // Configuration du carousel
+  // Configuration du carrousel
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
     slidesToShow: 3,
@@ -165,10 +110,9 @@ export default function Home() {
     prevArrow: <SamplePrevArrow />
   };
 
-  // Affiche un message de chargement tant que les tâches ne sont pas chargées
-  return isLoading ? <div>Loading...</div> : (
+  // Rendu du composant
+  return (
     <>
-      {/* Entête de la page */}
       <Head>
         <title>Todo-List App</title>
         <meta name="description" content="Todo-List App" />
@@ -178,81 +122,46 @@ export default function Home() {
       <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
         <h1 className={styles.title}>DONE</h1>
 
-        <div className={`${styles.centerContent} task-form-container`} style={{ height: formContainerHeight }}>
-          {/* Champ de saisie pour ajouter une nouvelle tâche */}
-          <input
-            type="text"
-            value={newTaskText}
-            onChange={handleNewTaskChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Entrez votre tâche ici..."
-            style={{ marginRight: '10px', height: '25px', verticalAlign: 'middle' }}
-          />
-          {/* Bouton pour ajouter une nouvelle tâche */}
-          <button onClick={addTask} style={{ height: '25px', verticalAlign: 'middle' }}>
-            <FontAwesomeIcon icon={faPlus} style={{ width: '20px', height: '15px' }} />
-          </button>
-          {/* Affichage du message de limite de tâches atteinte */}
-          {taskLimitReached && <p style={{ color: 'red', marginTop: '10px' }}>Vous avez atteint le nombre maximum de tâches.</p>}
-          
-          {/* Liste des tâches */}
-          <ul style={{ listStyleType: 'none', padding: 0, marginTop: '10px' }}>
-            {tasks.map((task, index) => (
-              <li key={task.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <span style={{ marginRight: '8px' }}>{index + 1}</span>
-                {editingTaskId === task.id ? (
-                  <>
-                    {/* Champ de saisie pour éditer une tâche */}
-                    <input
-                      type="text"
-                      value={editingTaskText}
-                      onChange={(e) => setEditingTaskText(e.target.value)}
-                      style={{
-                        width: '80%',
-                        display: 'block',
-                        margin: '0 auto',
-                        textAlign: 'center',
-                        maxWidth: '100%',
-                      }}
-                    />
-                    <button onClick={saveEditedTask}>Enregistrer</button>
-                    <button onClick={cancelEditTask}>Annuler</button>
-                  </>
-                ) : (
-                  <>
-                    {/* Affichage du texte de la tâche */}
-                    <span>{task.text}</span>
-                    <div>
-                      {/* Bouton pour éditer une tâche */}
-                      <button onClick={() => editTask(task.id, task.text)} style={{ marginRight: '10px' }}>
-                        <FontAwesomeIcon icon={faEdit} style={{ width: '20px', height: '15px' }} viewBox="0 0 448 512" />
-                      </button>
-                      {/* Bouton pour supprimer une tâche */}
-                      <button onClick={() => deleteTask(task.id)}>
-                        <FontAwesomeIcon icon={faTrash} style={{ width: '20px', height: '15px' }} viewBox="0 0 448 512" />
-                      </button>
-                    </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
+        {/* Entrées pour le titre de chaque liste */}
+        <div className={styles.buttons}>
+          {taskLists.map((list, index) => (
+            <div key={index} className={index === activeList ? styles.activeList : styles.clickableTitle} onClick={() => setActiveList(index)}>
+              {/* Afficher le titre de la liste de tâches */}
+              <input
+                type="text"
+                className={`${styles.titleInput} ${index === activeList ? styles.activeTitleInput : styles.inactiveTitleInput}`}
+                value={list.title}
+                onChange={(e) => handleTitleChange(index, e.target.value)}
+              />
+            </div>
+          ))}
         </div>
-        <br />
+
+        {/* Conteneur de la liste de tâches active */}
+        <div className={styles.taskListContainer} style={{ height: containerHeight ? `${containerHeight}px` : '4rem' }}>
+          {/* Afficher la liste de tâches active en fonction de l'état activeList */}
+          <TaskList listName={taskLists[activeList].title} tasks={taskLists[activeList].tasks} setTasks={(tasks) => handleTasksChange(activeList, tasks)} />
+        </div>
+
         {/* Bouton pour supprimer toutes les tâches */}
-        <button onClick={deleteAllTasks}>
-          <FontAwesomeIcon icon={faTrash} style={{ width: '28px', height: '25px' }} viewBox="0 0 448 512" />
-        </button>
-        
-        {/* Pied de page avec logo et liens */}
+        <div className={styles.deleteButtonContainer}>
+          <button className={styles.deleteButton} onClick={deleteAllTasks}>
+            <FontAwesomeIcon icon={faTrash} className={styles.deleteIcon} />
+          </button>
+        </div>
+
+        {/* Footer */}
         <footer style={{ textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
+          {/* Lien vers le site web */}
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} priority />
-          </a>
-          <p>Visitez notre site web :</p>
+          </a><br />
+          {/* Lien vers le site web avec le texte d'ancre */}
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             www.creativenumerik.com
           </a><br />
+
+          {/* Compteur de visiteurs */}
           <div className="compteurcontainer">
             <div className="compteur">
               <a href="http://www.mon-compteur.fr">
@@ -266,8 +175,8 @@ export default function Home() {
               </a>
             </div>
           </div>
-          
-          {/* Carousel pour changer l'image de fond */}
+
+          {/* Carrousel d'options de fond d'écran */}
           <div className={styles.carousel}>
             <Slider {...settings}>
               {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.jpeg'].map((bg, index) => (
