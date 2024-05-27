@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Slider from 'react-slick';
@@ -37,13 +37,8 @@ export default function Home() {
     { title: 'Liste 2', tasks: [] },
     { title: 'Liste 3', tasks: [] },
   ]);
-  const [taskLimitReached, setTaskLimitReached] = useState<boolean>(false);
   const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.png'); // Image de fond
   const [containerHeight, setContainerHeight] = useState<number>(4);
-
-
-  // Référence pour le conteneur de tâches
-  const taskContainerRef = useRef<HTMLDivElement>(null);
 
   // Effet pour charger les données depuis le stockage local au chargement de la page
   useEffect(() => {
@@ -58,23 +53,16 @@ export default function Home() {
     localStorage.setItem('taskLists', JSON.stringify(taskLists));
   }, [taskLists]);
 
-  // Effet pour mettre à jour la hauteur du conteneur lors du redimensionnement de la fenêtre
+  // Mettre à jour la hauteur du conteneur
+  const updateContainerHeight = (height: number) => {
+    const activeTasks = taskLists[activeList].tasks.length;
+    setContainerHeight(4 + activeTasks * 2.5);
+  };
+
+  // Mettre à jour la hauteur du conteneur quand la liste des tâches change
   useEffect(() => {
-    const handleResize = () => {
-      setContainerHeight(window.innerHeight);
-    };
-
-    if (typeof window !== 'undefined') {
-      setContainerHeight(window.innerHeight);
-      window.addEventListener('resize', handleResize);
-    }
-
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('resize', handleResize);
-      }
-    };
-  }, []);
+    updateContainerHeight();
+  }, [taskLists, activeList]);
 
   // Fonction pour gérer le changement de liste de tâches active lorsqu'un titre est cliqué
   const handleListClick = (index: number) => {
@@ -88,10 +76,17 @@ export default function Home() {
   };
 
   // Fonction pour mettre à jour les tâches d'une liste de tâches
-  const handleTasksChange = (index: number, tasks: Task[]) => {
+    const handleTasksChange = (index: number, tasks: Task[]) => {
     const updatedTaskLists = taskLists.map((list, i) => i === index ? { ...list, tasks } : list);
     setTaskLists(updatedTaskLists);
-  };
+
+  // Calculer la hauteur totale des tâches pour la liste active
+  const totalTaskHeight = tasks.length * 50; // Hauteur estimée de chaque tâche (ajustez selon vos besoins)
+  // Ajouter une marge supplémentaire pour l'espace entre les tâches
+  const totalHeightWithMargin = totalTaskHeight + (tasks.length > 0 ? 20 : 0); // 20px de marge si des tâches sont présentes, ajustez selon vos besoins
+  // Mettre à jour la hauteur du conteneur
+  setContainerHeight(totalHeightWithMargin);
+};
 
   // Fonction pour supprimer toutes les tâches de la liste active
   const deleteAllTasks = () => {
@@ -125,7 +120,7 @@ export default function Home() {
         {/* Entrées pour le titre de chaque liste */}
         <div className={styles.buttons}>
           {taskLists.map((list, index) => (
-            <div key={index} className={index === activeList ? styles.activeList : styles.clickableTitle} onClick={() => setActiveList(index)}>
+            <div key={index} className={index === activeList ? styles.activeList : styles.clickableTitle} onClick={() => handleListClick(index)}>
               {/* Afficher le titre de la liste de tâches */}
               <input
                 type="text"
@@ -138,9 +133,10 @@ export default function Home() {
         </div>
 
         {/* Conteneur de la liste de tâches active */}
-        <div className={styles.taskListContainer} style={{ height: containerHeight ? `${containerHeight}px` : '4rem' }}>
+        <div className={styles.taskListContainer} style={{ height: `${containerHeight}rem` }}>
           {/* Afficher la liste de tâches active en fonction de l'état activeList */}
-          <TaskList listName={taskLists[activeList].title} tasks={taskLists[activeList].tasks} setTasks={(tasks) => handleTasksChange(activeList, tasks)} />
+          <TaskList listName={taskLists[activeList].title} tasks={taskLists[activeList].tasks} setTasks={(tasks) => handleTasksChange(activeList, tasks)}
+          updateContainerHeight={updateContainerHeight} />
         </div>
 
         {/* Bouton pour supprimer toutes les tâches */}
@@ -179,7 +175,7 @@ export default function Home() {
           {/* Carrousel d'options de fond d'écran */}
           <div className={styles.carousel}>
             <Slider {...settings}>
-              {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.jpeg'].map((bg, index) => (
+              {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/cosmic-reef.jpeg', '/images/backgrounds/Leo-const.jpeg', '/images/backgrounds/galaxy.jpeg', '/images/backgrounds/hubble.jpeg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
                 <div key={index} className={styles.backgroundOptionContainer}>
                   <div
                     className={styles.backgroundOption}

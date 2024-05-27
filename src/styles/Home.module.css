@@ -52,8 +52,8 @@
 .activeTitleInput {
   background-color: rgb(255, 255, 255); /* Couleur de fond pour le titre actif */
   transition: background-color 0.3s ease;
-  outline: 2px solid rgb(0, 255, 153); /* Couleur et épaisseur de l'outline pour le titre actif */
-  border: 2px solid rgb(0, 255, 225); /* Couleur et épaisseur de la bordure pour le titre actif */
+  outline: 2px solid rgb(2, 209, 250); /* Couleur et épaisseur de l'outline pour le titre actif */
+  border: 2px solid rgb(51, 182, 215); /* Couleur et épaisseur de la bordure pour le titre actif */
   transition: outline 0.3s ease, border 0.3s ease;
 
 }
@@ -89,6 +89,7 @@
   justify-content: space-between; /* Pour espacer les boutons */
   margin-top: 10px; /* Pour ajouter de l'espace au-dessus des boutons */
   margin-right: -5px;
+  margin-bottom: 6px;
 }
 
 .taskButtons button {
@@ -135,7 +136,17 @@
   margin-top: 10px;
   list-style: none;
   overflow: hidden; /* Cache le débordement pour une transition fluide */
-  transition: max-height 0.3s ease-in-out; /* Ajoute une transition pour un effet fluide */
+  transition: height 0.3s ease-in-out; /* Ajoute une transition pour un effet fluide */
+}
+
+.taskListContainer ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.taskListContainer li {
+  height: 2rem;
 }
 
 .containerHeight {

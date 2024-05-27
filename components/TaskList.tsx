@@ -12,25 +12,24 @@ type TaskListProps = {
   listName: string;
   tasks: Task[];
   setTasks: (tasks: Task[]) => void;
+  updateContainerHeight: (height: number) => void; // Ajoutez une fonction pour mettre à jour la hauteur du conteneur
 };
 
-const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks }) => {
+const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks, updateContainerHeight }) => {
+  const taskContainerRef = useRef<HTMLDivElement | null>(null);
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTaskText, setEditingTaskText] = useState<string>('');
-
-  // Référence pour le conteneur de tâches
-  const taskContainerRef = useRef<HTMLDivElement | null>(null);
+  const MAX_TASKS = 15;
 
   useEffect(() => {
-    if (taskContainerRef.current) {
-      // Calcule la hauteur totale des tâches
-      const taskHeight = tasks.length * 1.5; // Supposons que chaque tâche a une hauteur de 1.5rem
-  
-      // Définit la hauteur du conteneur de tâches en fonction du nombre de tâches
-      taskContainerRef.current.style.height = `calc(4rem + ${taskHeight}rem)`;
-    }
-  }, [tasks]);
+    // Calculer la hauteur totale des tâches rendues
+    const totalTaskHeight = tasks.length * 50; // Hauteur estimée de chaque tâche (ajustez selon vos besoins)
+    // Ajouter une marge supplémentaire pour l'espace entre les tâches
+    const totalHeightWithMargin = totalTaskHeight + (tasks.length > 0 ? 20 : 0); // 20px de marge si des tâches sont présentes, ajustez selon vos besoins
+    // Mettre à jour la hauteur du conteneur dans le composant parent
+    updateContainerHeight(totalHeightWithMargin);
+  }, [tasks, updateContainerHeight]);
   
 
   const saveTasksToLocalStorage = (updatedTasks: Task[]) => {
@@ -103,35 +102,41 @@ const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks }) => {
       </button>
 
       <ul className={styles.taskList}>
-        {tasks.map(task => (
-          <li key={task.id} className={styles.taskItem}>
-            {editingTaskId === task.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editingTaskText}
-                  onChange={(e) => setEditingTaskText(e.target.value)}
-                />
-                <button onClick={saveEditedTask}>Enregistrer</button>
-                <button onClick={() => setEditingTaskId(null)}>Annuler</button>
-              </>
-            ) : (
-              <>
-                <span>{task.id}. {task.text}</span>
+  {tasks.length >= MAX_TASKS && (
+    <li className={styles.taskItem}>
+      <span className={styles.errorMessage}>Vous avez atteint le nombre maximum de tâches.</span>
+    </li>
+  )}
+  {tasks.map(task => (
+    <li key={task.id} className={styles.taskItem} style={{ marginBottom: '10px' }}>
+      {editingTaskId === task.id ? (
+        <div style={{ marginTop: '5px' }}>
+          <input
+            type="text"
+            value={editingTaskText}
+            onChange={(e) => setEditingTaskText(e.target.value)}
+          />
+          <button onClick={saveEditedTask}>Enregistrer</button>
+          <button onClick={() => setEditingTaskId(null)}>Annuler</button>
+        </div>
+      ) : (
+        <>
+          <span>{task.id}. {task.text}</span>
 
-                <div className={styles.taskButtons}>
-                  <button onClick={() => editTask(task.id, task.text)}>
-                    <FontAwesomeIcon icon={faEdit} style={{ width: '20px', height: '15px' }} />
-                  </button>
-                  <button onClick={() => deleteTask(task.id)}>
-                    <FontAwesomeIcon icon={faTrash} style={{ width: '20px', height: '15px' }} />
-                  </button>
-                </div>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+          <div className={styles.taskButtons}>
+            <button onClick={() => editTask(task.id, task.text)}>
+              <FontAwesomeIcon icon={faEdit} style={{ width: '20px', height: '15px' }} />
+            </button>
+            <button onClick={() => deleteTask(task.id)}>
+              <FontAwesomeIcon icon={faTrash} style={{ width: '20px', height: '15px' }} />
+            </button>
+          </div>
+        </>
+      )}
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };
