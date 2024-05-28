@@ -246,6 +246,10 @@
   align-items: center;
 }
 
+.blackLink {
+  color: black;
+}
+
 .carousel {
   margin-top: 20px;
   width: 160px;
@@ -320,7 +324,7 @@
     font-size: 30px;
     width: 60%; /* Redimensionnez encore la taille du titre */
   }
-  /* Vous pouvez ajouter d'autres styles pour les éléments qui doivent s'adapter à des écrans encore plus petits */
+  
 }
 
 @media screen and (max-width: 375px) {

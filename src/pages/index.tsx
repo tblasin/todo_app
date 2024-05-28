@@ -6,8 +6,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
-import TaskList from '../../components/TaskList'; // Composant de liste de tâches
-import styles from '@/styles/Home.module.css'; // Fichier de styles CSS
+import TaskList from '../../components/TaskList'; // Assurez-vous que ce chemin est correct
+import styles from '@/styles/Home.module.css'; // Assurez-vous que ce chemin est correct
 
 // Définition du type Task
 type Task = {
@@ -30,12 +30,12 @@ const SamplePrevArrow: React.FC<any> = ({ onClick }) => (
 );
 
 // Composant principal de l'application
-export default function Home() {
+const Home: React.FC = () => {
   const [activeList, setActiveList] = useState<number>(0); // État pour suivre la liste de tâches active
   const [taskLists, setTaskLists] = useState<Array<{ title: string, tasks: Task[] }>>([
-    { title: 'Liste 1', tasks: [] },
-    { title: 'Liste 2', tasks: [] },
-    { title: 'Liste 3', tasks: [] },
+    { title: '', tasks: [] },
+    { title: '', tasks: [] },
+    { title: '', tasks: [] },
   ]);
   const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.png'); // Image de fond
   const [containerHeight, setContainerHeight] = useState<number>(4);
@@ -54,7 +54,7 @@ export default function Home() {
   }, [taskLists]);
 
   // Mettre à jour la hauteur du conteneur
-  const updateContainerHeight = (height: number) => {
+  const updateContainerHeight = () => {
     const activeTasks = taskLists[activeList].tasks.length;
     setContainerHeight(4 + activeTasks * 2.5);
   };
@@ -76,22 +76,19 @@ export default function Home() {
   };
 
   // Fonction pour mettre à jour les tâches d'une liste de tâches
-    const handleTasksChange = (index: number, tasks: Task[]) => {
+  const handleTasksChange = (index: number, tasks: Task[]) => {
     const updatedTaskLists = taskLists.map((list, i) => i === index ? { ...list, tasks } : list);
     setTaskLists(updatedTaskLists);
 
-  // Calculer la hauteur totale des tâches pour la liste active
-  const totalTaskHeight = tasks.length * 50; // Hauteur estimée de chaque tâche (ajustez selon vos besoins)
-  // Ajouter une marge supplémentaire pour l'espace entre les tâches
-  const totalHeightWithMargin = totalTaskHeight + (tasks.length > 0 ? 20 : 0); // 20px de marge si des tâches sont présentes, ajustez selon vos besoins
-  // Mettre à jour la hauteur du conteneur
-  setContainerHeight(totalHeightWithMargin);
-};
+    updateContainerHeight();
+  };
 
   // Fonction pour supprimer toutes les tâches de la liste active
   const deleteAllTasks = () => {
     const updatedTaskLists = taskLists.map((list, i) => i === activeList ? { ...list, tasks: [] } : list);
     setTaskLists(updatedTaskLists);
+
+    updateContainerHeight();
   };
 
   // Configuration du carrousel
@@ -102,7 +99,26 @@ export default function Home() {
     slidesToShow: 3,
     slidesToScroll: 1,
     nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />
+    prevArrow: <SamplePrevArrow />,
+    swipe: true,
+    touchMove: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          infinite: true,
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
   };
 
   // Rendu du composant
@@ -126,6 +142,7 @@ export default function Home() {
                 type="text"
                 className={`${styles.titleInput} ${index === activeList ? styles.activeTitleInput : styles.inactiveTitleInput}`}
                 value={list.title}
+                placeholder={`Nommez Liste ${index + 1}`}
                 onChange={(e) => handleTitleChange(index, e.target.value)}
               />
             </div>
@@ -135,8 +152,12 @@ export default function Home() {
         {/* Conteneur de la liste de tâches active */}
         <div className={styles.taskListContainer} style={{ height: `${containerHeight}rem` }}>
           {/* Afficher la liste de tâches active en fonction de l'état activeList */}
-          <TaskList listName={taskLists[activeList].title} tasks={taskLists[activeList].tasks} setTasks={(tasks) => handleTasksChange(activeList, tasks)}
-          updateContainerHeight={updateContainerHeight} />
+          <TaskList
+            listName={taskLists[activeList].title}
+            tasks={taskLists[activeList].tasks}
+            setTasks={(tasks) => handleTasksChange(activeList, tasks)}
+            updateContainerHeight={updateContainerHeight}
+          />
         </div>
 
         {/* Bouton pour supprimer toutes les tâches */}
@@ -150,27 +171,12 @@ export default function Home() {
         <footer style={{ textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
           {/* Lien vers le site web */}
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
-            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} priority />
+            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} />
           </a><br />
           {/* Lien vers le site web avec le texte d'ancre */}
-          <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
+          <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer" className={styles.blackLink} >
             www.creativenumerik.com
           </a><br />
-
-          {/* Compteur de visiteurs */}
-          <div className="compteurcontainer">
-            <div className="compteur">
-              <a href="http://www.mon-compteur.fr">
-                <Image 
-                  src="http://www.mon-compteur.fr/html_c02genv2-77655-1"
-                  width='50'
-                  height='10'
-                  alt="compteur visiteurs"
-                  fetchPriority={"low"} 
-                />
-              </a>
-            </div>
-          </div>
 
           {/* Carrousel d'options de fond d'écran */}
           <div className={styles.carousel}>
@@ -191,3 +197,5 @@ export default function Home() {
     </>
   );
 }
+
+export default Home;
