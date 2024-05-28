@@ -168,7 +168,7 @@ const Home: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <footer style={{ textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
+        <footer style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
           {/* Lien vers le site web */}
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} />

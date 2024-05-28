@@ -11,7 +11,7 @@
   background-image: url('/tropical-palms.jpg'); /* Chemin relatif à partir de la racine du dossier public */
   background-size: cover;
   background-position: center;
-  background-color: darkcyan;
+  background-color: rgb(5, 5, 5);
 }
 
 .title {
@@ -318,13 +318,29 @@
   }
 }
 
+
 @media screen and (max-width: 480px) {
   /* Ajoutez vos styles spécifiques pour les écrans jusqu'à 480px de largeur */
   .title {
     font-size: 30px;
     width: 60%; /* Redimensionnez encore la taille du titre */
   }
-  
+
+  .carousel {
+    margin-top: 20px;
+    width: 100px;
+    height: 60px;
+    position: relative;
+    padding-left: 48px;
+    margin-left: -15px;
+  }
+
+  .slick-slide {
+    display: flex;
+    justify-content: center;
+    flex: 0 0 33.33% !important; /* Affiche trois images à la fois */
+    width: 35%;
+  }
 }
 
 @media screen and (max-width: 375px) {
