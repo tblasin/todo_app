@@ -1,0 +1,48 @@
+/* Style pour les événements */
+.rbc-event {
+    background-color: #4caf50; /* Couleur de fond des événements */
+    border: 1px solid #388e3c; /* Bordure des événements */
+    color: white; /* Couleur du texte des événements */
+    border-radius: 4px; /* Coins arrondis */
+    padding: 2px 4px; /* Espacement interne */
+  }
+  
+  /* Style pour les jours */
+  .rbc-day-bg {
+    background-color: #f5f5f5; /* Couleur de fond des jours */
+  }
+  
+  /* Style pour le jour actuel */
+  .rbc-today {
+    background-color: #e0f7fa; /* Couleur de fond du jour actuel */
+  }
+  
+  /* Style pour les en-têtes */
+  .rbc-header {
+    background-color: #00796b; /* Couleur de fond des en-têtes */
+    color: white; /* Couleur du texte des en-têtes */
+    padding: 10px; /* Espacement interne des en-têtes */
+    text-align: center; /* Alignement centré du texte */
+    border-bottom: 1px solid #004d40; /* Bordure inférieure des en-têtes */
+  }
+  
+  /* Style pour les cellules sélectionnées */
+  .rbc-selected-cell {
+    background-color: #80cbc4; /* Couleur de fond des cellules sélectionnées */
+  }
+  
+  /* Style pour les heures dans la vue semaine/jour */
+  .rbc-time-content {
+    border-top: 2px solid #00796b; /* Bordure supérieure des heures */
+  }
+  
+  /* Style pour les heures dans la vue semaine/jour */
+  .rbc-timeslot-group {
+    border-top: 1px solid #e0e0e0; /* Bordure supérieure des créneaux horaires */
+  }
+  
+  /* Style pour les heures */
+  .rbc-time-slot {
+    min-height: 20px; /* Hauteur minimale des créneaux horaires */
+  }
+  

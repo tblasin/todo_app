@@ -14,7 +14,7 @@
   background-color: rgb(5, 5, 5);
 }
 
-.title {
+.title1 {
   display: flex;
   justify-content: center;
   font-size: 29px;
@@ -30,7 +30,7 @@
   background-size: cover;
   background-position: center;
   padding: 20px;
-  width: 10%;
+  width: 25%;
   z-index: 1; 
   margin-top: 20px;
 }
@@ -294,7 +294,29 @@
   display: none;
 }
 
+.title2 {
+  display: flex;
+  justify-content: center;
+  font-size: 29px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  transform: scale(1.05);
+  transition: transform 0.3s ease-in-out;
+  margin-bottom: 20px;
+  color: #ffffff;
+  font-family: sans-serif;
+  position: relative; /* Position relative pour utiliser z-index */
+  background-color: #000000;
+  box-shadow: inset 0 0 0 2px white, inset 0 0 0 3px black; /* Crée un liseré blanc de 1 pixel autour du titre */
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+  width: 25%;
+  z-index: 1; 
+  margin-top: 100px;
+}
+
 /* Media queries pour les tailles d'écran spécifiques */
+
 @media screen and (max-width: 1024px) {
   /* Ajoutez vos styles spécifiques pour les écrans jusqu'à 768px de largeur */
   .title {

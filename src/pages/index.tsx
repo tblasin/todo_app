@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Agenda from '../../components/Agenda';
 import Image from 'next/image';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
@@ -131,7 +132,7 @@ const Home: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
-        <h1 className={styles.title}>DONE</h1>
+        <h1 className={styles.title1}>DONE</h1>
 
         {/* Entrées pour le titre de chaque liste */}
         <div className={styles.buttons}>
@@ -142,7 +143,7 @@ const Home: React.FC = () => {
                 type="text"
                 className={`${styles.titleInput} ${index === activeList ? styles.activeTitleInput : styles.inactiveTitleInput}`}
                 value={list.title}
-                placeholder={`Nommez Liste ${index + 1}`}
+                placeholder={`Liste ${index + 1}`}
                 onChange={(e) => handleTitleChange(index, e.target.value)}
               />
             </div>
@@ -166,6 +167,8 @@ const Home: React.FC = () => {
             <FontAwesomeIcon icon={faTrash} className={styles.deleteIcon} />
           </button>
         </div>
+        <h1 className={styles.title2}>AGENDA</h1>
+        <Agenda />
 
         {/* Footer */}
         <footer style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
@@ -181,7 +184,7 @@ const Home: React.FC = () => {
           {/* Carrousel d'options de fond d'écran */}
           <div className={styles.carousel}>
             <Slider {...settings}>
-              {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/sunbarrel.jpeg', '/images/backgrounds/Sunset.webp', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/cosmic-reef.jpeg', '/images/backgrounds/Leo-const.jpeg', '/images/backgrounds/galaxy.jpeg', '/images/backgrounds/hubble.jpeg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
+              {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/moon.webp', '/images/backgrounds/morocco.jpg', '/images/backgrounds/tropical.jpg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
                 <div key={index} className={styles.backgroundOptionContainer}>
                   <div
                     className={styles.backgroundOption}
