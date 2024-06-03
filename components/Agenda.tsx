@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer, Event } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import styles from '../src/styles/Home.module.css';
+
 
 
 const localizer = momentLocalizer(moment);
@@ -37,7 +39,7 @@ const Agenda: React.FC = () => {
   };
 
   return (
-    <div style={{ height: 500 }}>
+    <div className={styles.agendaContainer}>
       <Calendar
         localizer={localizer}
         events={events}

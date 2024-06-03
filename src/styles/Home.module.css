@@ -315,6 +315,10 @@
   margin-top: 100px;
 }
 
+.agendaContainer{
+  height: 500px !important;
+}
+
 /* Media queries pour les tailles d'écran spécifiques */
 
 @media screen and (max-width: 1024px) {
@@ -338,6 +342,23 @@
     font-size: 35px; /* Redimensionnez la taille du titre */
     width: 35%; /* Ajustez la largeur du titre pour occuper toute la largeur de l'écran */
   }
+}
+
+
+@media (max-width: 768px) {
+  .agendaContainer {
+      height: 360px !important;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .title1{
+    width: 40%;
+  }
+  .title2{
+    width: 45%;
+  }
+
 }
 
 
