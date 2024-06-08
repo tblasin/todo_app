@@ -184,7 +184,7 @@ const Home: React.FC = () => {
           {/* Carrousel d'options de fond d'écran */}
           <div className={styles.carousel}>
             <Slider {...settings}>
-              {['/images/backgrounds/boreal.png', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/moon.webp', '/images/backgrounds/morocco.jpg', '/images/backgrounds/tropical.jpg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
+              {['/images/backgrounds/boreale.jpeg', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/moon.webp', '/images/backgrounds/morocco.jpg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
                 <div key={index} className={styles.backgroundOptionContainer}>
                   <div
                     className={styles.backgroundOption}

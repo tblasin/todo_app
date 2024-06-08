@@ -317,30 +317,29 @@
 
 .agendaContainer{
   height: 500px !important;
+  margin-top: 50px;
 }
 
 /* Media queries pour les tailles d'écran spécifiques */
 
 @media screen and (max-width: 1024px) {
-  /* Ajoutez vos styles spécifiques pour les écrans jusqu'à 768px de largeur */
   .title {
-    font-size: 30px; /* Redimensionnez la taille du titre */
-    width: 22%; /* Ajustez la largeur du titre pour occuper toute la largeur de l'écran */
+    font-size: 30px; 
+    width: 22%; 
   }
 }
 @media screen and (max-width: 820px) {
-  /* Ajoutez vos styles spécifiques pour les écrans jusqu'à 768px de largeur */
   .title {
-    font-size: 30px; /* Redimensionnez la taille du titre */
-    width: 30%; /* Ajustez la largeur du titre pour occuper toute la largeur de l'écran */
+    font-size: 30px; 
+    width: 30%; 
   }
 }
 
 @media screen and (max-width: 768px) {
-  /* Ajoutez vos styles spécifiques pour les écrans jusqu'à 768px de largeur */
+  
   .title {
-    font-size: 35px; /* Redimensionnez la taille du titre */
-    width: 35%; /* Ajustez la largeur du titre pour occuper toute la largeur de l'écran */
+    font-size: 35px; 
+    width: 35%; 
   }
 }
 
@@ -363,10 +362,10 @@
 
 
 @media screen and (max-width: 480px) {
-  /* Ajoutez vos styles spécifiques pour les écrans jusqu'à 480px de largeur */
+  
   .title {
     font-size: 30px;
-    width: 60%; /* Redimensionnez encore la taille du titre */
+    width: 60%; 
   }
 
   .carousel {
