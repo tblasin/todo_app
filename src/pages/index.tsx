@@ -38,7 +38,7 @@ const Home: React.FC = () => {
     { title: '', tasks: [] },
     { title: '', tasks: [] },
   ]);
-  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/boreal.png'); // Image de fond
+  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/morocco.jpg'); // Image de fond
   const [containerHeight, setContainerHeight] = useState<number>(4);
 
   // Effet pour charger les données depuis le stockage local au chargement de la page
