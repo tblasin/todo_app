@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Agenda from '../../components/Agenda';
 import Image from 'next/image';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
@@ -132,6 +131,7 @@ const Home: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
+
         <h1 className={styles.title1}>DONE</h1>
 
         {/* Entrées pour le titre de chaque liste */}
@@ -167,11 +167,10 @@ const Home: React.FC = () => {
             <FontAwesomeIcon icon={faTrash} className={styles.deleteIcon} />
           </button>
         </div>
-        <h1 className={styles.title2}>AGENDA</h1>
-        <Agenda />
 
         {/* Footer */}
         <footer style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
+        <div><p>&#123; Coded by : Creative Numerik &#125;</p></div><br /><br />
           {/* Lien vers le site web */}
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} />
@@ -195,6 +194,7 @@ const Home: React.FC = () => {
               ))}
             </Slider>
           </div>
+         
         </footer>
       </main>
     </>

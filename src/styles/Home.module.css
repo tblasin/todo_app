@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 20px;
+  padding: 200px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-image: url('/tropical-palms.jpg'); /* Chemin relatif à partir de la racine du dossier public */
   background-size: cover;
