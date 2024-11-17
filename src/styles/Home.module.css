@@ -6,12 +6,13 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 200px;
+  padding: 10%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-image: url('/tropical-palms.jpg'); /* Chemin relatif à partir de la racine du dossier public */
   background-size: cover;
   background-position: center;
   background-color: rgb(5, 5, 5);
+  transition: background-image 0.5s ease-in-out;
 }
 
 .title1 {
@@ -248,10 +249,11 @@
 
 .blackLink {
   color: black;
+  font-weight: bold;
 }
 
 .carousel {
-  margin-top: 20px;
+  margin-top: 50%;
   width: 160px;
   height: 60px;
   position: relative;
@@ -370,11 +372,10 @@
 
   .carousel {
     margin-top: 20px;
-    width: 100px;
+    width: 95px;
     height: 60px;
     position: relative;
-    padding-left: 48px;
-    margin-left: -15px;
+    padding-left: 30%;
   }
 
   .slick-slide {

@@ -6,9 +6,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
-import TaskList from '../../components/TaskList'; // Assurez-vous que ce chemin est correct
-import styles from '@/styles/Home.module.css'; // Assurez-vous que ce chemin est correct
+import TaskList from '../../components/TaskList'; 
+import styles from '@/styles/Home.module.css'; 
 
+ 
 // Définition du type Task
 type Task = {
   id: number;
@@ -39,6 +40,23 @@ const Home: React.FC = () => {
   ]);
   const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/morocco.jpg'); // Image de fond
   const [containerHeight, setContainerHeight] = useState<number>(4);
+  const [visitCount, setVisitCount] = useState<number | null>(null);
+
+  // Incrémenter le compteur de visites lors du chargement de la page
+  useEffect(() => {
+    const incrementVisitCount = async () => {
+      await fetch('/api/visits', { method: 'POST' });
+    };
+
+    const fetchVisitCount = async () => {
+      const response = await fetch('/api/visits');
+      const data = await response.json();
+      setVisitCount(data.count);
+    };
+
+    incrementVisitCount();
+    fetchVisitCount();
+  }, []);
 
   // Effet pour charger les données depuis le stockage local au chargement de la page
   useEffect(() => {
@@ -133,7 +151,7 @@ const Home: React.FC = () => {
       <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
 
         <h1 className={styles.title1}>DONE</h1>
-
+        <Image className="logogtd" src="/images/GTD.png" alt="Logo getting things done" width={115} height={30} />
         {/* Entrées pour le titre de chaque liste */}
         <div className={styles.buttons}>
           {taskLists.map((list, index) => (
@@ -143,7 +161,7 @@ const Home: React.FC = () => {
                 type="text"
                 className={`${styles.titleInput} ${index === activeList ? styles.activeTitleInput : styles.inactiveTitleInput}`}
                 value={list.title}
-                placeholder={`Liste ${index + 1}`}
+                placeholder={`Nommez Liste ${index + 1}`}
                 onChange={(e) => handleTitleChange(index, e.target.value)}
               />
             </div>
@@ -170,7 +188,9 @@ const Home: React.FC = () => {
 
         {/* Footer */}
         <footer style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
-        <div><p>&#123; Coded by : Creative Numerik &#125;</p></div><br /><br />
+        <div style={{ color: 'black'}}>
+          <p>&#123; Coded by : Creative Numerik &#125;</p>
+        </div><br /><br />
           {/* Lien vers le site web */}
           <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
             <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} />
@@ -183,7 +203,7 @@ const Home: React.FC = () => {
           {/* Carrousel d'options de fond d'écran */}
           <div className={styles.carousel}>
             <Slider {...settings}>
-              {['/images/backgrounds/boreale.jpeg', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/moon.webp', '/images/backgrounds/morocco.jpg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
+              {['/images/backgrounds/boreale.jpeg', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/morocco.jpg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
                 <div key={index} className={styles.backgroundOptionContainer}>
                   <div
                     className={styles.backgroundOption}
