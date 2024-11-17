@@ -40,23 +40,7 @@ const Home: React.FC = () => {
   ]);
   const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/morocco.jpg'); // Image de fond
   const [containerHeight, setContainerHeight] = useState<number>(4);
-  const [visitCount, setVisitCount] = useState<number | null>(null);
-
-  // Incrémenter le compteur de visites lors du chargement de la page
-  useEffect(() => {
-    const incrementVisitCount = async () => {
-      await fetch('/api/visits', { method: 'POST' });
-    };
-
-    const fetchVisitCount = async () => {
-      const response = await fetch('/api/visits');
-      const data = await response.json();
-      setVisitCount(data.count);
-    };
-
-    incrementVisitCount();
-    fetchVisitCount();
-  }, []);
+  
 
   // Effet pour charger les données depuis le stockage local au chargement de la page
   useEffect(() => {
