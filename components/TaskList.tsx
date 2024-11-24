@@ -97,7 +97,7 @@ const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks, updateCo
         placeholder="Entrez votre tâche ici..."
         style={{ marginRight: '10px', height: '25px', verticalAlign: 'middle' }}
       />
-      <button onClick={addTask} style={{ height: '25px', verticalAlign: 'middle' }}>
+      <button onClick={addTask} className='addbutton' style={{ height: '25px', verticalAlign: 'middle' }}>
         <FontAwesomeIcon icon={faPlus} style={{ width: '20px', height: '15px' }} />
       </button>
 

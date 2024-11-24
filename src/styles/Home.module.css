@@ -354,10 +354,23 @@
 
 @media screen and (max-width: 540px) {
   .title1{
-    width: 40%;
+    width: 80%;
   }
   .title2{
     width: 45%;
+  }
+
+  .buttons {
+    width: 110%;
+  }
+
+  .addbutton {
+    margin-left: 2%;
+  }
+
+  .titleInput {
+    width: 100%;
+    font-size: xx-small;
   }
 
 }
@@ -397,6 +410,27 @@
 @media screen and (max-width: 360px) {
   .title{
     font-size: 27px;
+  }
+
+}
+
+@media screen and (max-width: 324px) {
+  .addTaskContainer {
+    margin-bottom: 1rem;
+    width: 110%;
+  }
+
+  .buttons {
+    width: 110%;
+  }
+
+  .addbutton {
+    margin-left: 2%;
+  }
+
+  .titleInput {
+    width: 100%;
+    font-size: xx-small;
   }
 
 }
