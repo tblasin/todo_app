@@ -90,14 +90,14 @@ const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks, updateCo
   return (
     <div className={styles.addTaskContainer} ref={taskContainerRef}>
       <input
+        className={styles.inputAddTask}
         type="text"
         value={newTaskText}
         onChange={(e) => setNewTaskText(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Entrez votre tâche ici..."
-        style={{ marginRight: '10px', height: '25px', verticalAlign: 'middle' }}
       />
-      <button onClick={addTask} className='addbutton' style={{ height: '25px', verticalAlign: 'middle' }}>
+      <button onClick={addTask} className='addbutton' style={{ cursor: 'pointer', height: '30px', width: '30px', verticalAlign: 'middle', marginLeft: '26px' }}>
         <FontAwesomeIcon icon={faPlus} style={{ width: '20px', height: '15px' }} />
       </button>
 
@@ -125,10 +125,10 @@ const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks, updateCo
 
           <div className={styles.taskButtons}>
             <button onClick={() => editTask(task.id, task.text)}>
-              <FontAwesomeIcon icon={faEdit} style={{ width: '20px', height: '15px' }} />
+              <FontAwesomeIcon icon={faEdit} style={{ cursor: 'pointer', width: '20px', height: '15px' }} />
             </button>
             <button onClick={() => deleteTask(task.id)}>
-              <FontAwesomeIcon icon={faTrash} style={{ width: '20px', height: '15px' }} />
+              <FontAwesomeIcon icon={faTrash} style={{ cursor: 'pointer', width: '20px', height: '15px' }} />
             </button>
           </div>
         </>
