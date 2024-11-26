@@ -194,6 +194,7 @@
 .addTaskContainer {
   margin-bottom: 1rem;
   width: 95%;
+  margin-left: 3%;
 }
 
 .add-task-container input[type="text"] {
