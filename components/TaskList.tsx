@@ -1,144 +1,104 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-import styles from '@/styles/Home.module.css';
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import type { Priority, Task } from "@/types/task";
+import { createTask } from "@/utils/storage";
+import TaskItem from "./TaskItem";
+import styles from "@/styles/Home.module.css";
 
-type Task = {
-  id: number;
-  text: string;
-};
-
-type TaskListProps = {
-  listName: string;
+type Props = {
   tasks: Task[];
   setTasks: (tasks: Task[]) => void;
-  updateContainerHeight: (height: number) => void; // Ajoutez une fonction pour mettre à jour la hauteur du conteneur
 };
 
-const TaskList: React.FC<TaskListProps> = ({ listName, tasks, setTasks, updateContainerHeight }) => {
-  const taskContainerRef = useRef<HTMLDivElement | null>(null);
-  const [newTaskText, setNewTaskText] = useState<string>('');
-  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
-  const [editingTaskText, setEditingTaskText] = useState<string>('');
-  const MAX_TASKS = 15;
+const MAX_TASKS = 30;
 
-  useEffect(() => {
-    // Calculer la hauteur totale des tâches rendues
-    const totalTaskHeight = tasks.length * 50; // Hauteur estimée de chaque tâche (ajustez selon vos besoins)
-    // Ajouter une marge supplémentaire pour l'espace entre les tâches
-    const totalHeightWithMargin = totalTaskHeight + (tasks.length > 0 ? 20 : 0); // 20px de marge si des tâches sont présentes, ajustez selon vos besoins
-    // Mettre à jour la hauteur du conteneur dans le composant parent
-    updateContainerHeight(totalHeightWithMargin);
-  }, [tasks, updateContainerHeight]);
-  
-
-  const saveTasksToLocalStorage = (updatedTasks: Task[]) => {
-    localStorage.setItem(`tasks_${listName}`, JSON.stringify(updatedTasks));
-  };
+export default function TaskList({ tasks, setTasks }: Props) {
+  const [newTaskText, setNewTaskText] = useState("");
 
   const addTask = () => {
-    if (tasks.length >= 15) {
-      alert('Vous ne pouvez pas ajouter plus de 15 tâches.');
-      return;
-    }
-    if (newTaskText.trim() !== '') {
-      const newTask: Task = {
-        id: tasks.length + 1,
-        text: newTaskText.trim(),
-      };
-      const updatedTasks = [...tasks, newTask];
-      setTasks(updatedTasks);
-      saveTasksToLocalStorage(updatedTasks);
-      setNewTaskText('');
-    }
+    const text = newTaskText.trim();
+    if (!text) return;
+    if (tasks.length >= MAX_TASKS) return;
+    setTasks([...tasks, createTask(text)]);
+    setNewTaskText("");
   };
 
-  const editTask = (id: number, text: string) => {
-    setEditingTaskId(id);
-    setEditingTaskText(text);
+  const toggleTask = (id: string) => {
+    setTasks(
+      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
   };
 
-  const saveEditedTask = () => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === editingTaskId) {
-        return { ...task, text: editingTaskText };
-      }
-      return task;
-    });
-    setTasks(updatedTasks);
-    saveTasksToLocalStorage(updatedTasks);
-    setEditingTaskId(null);
-    setEditingTaskText('');
+  const deleteTask = (id: string) => {
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
-  const deleteTask = (id: number) => {
-    const updatedTasks = tasks.filter(task => task.id !== id);
-    const renumberedTasks = updatedTasks.map((task, index) => ({
-      ...task,
-      id: index + 1
-    }));
-    setTasks(renumberedTasks);
-    saveTasksToLocalStorage(renumberedTasks);
+  const editTask = (id: string, text: string) => {
+    setTasks(tasks.map((t) => (t.id === id ? { ...t, text } : t)));
+  };
+
+  const setPriority = (id: string, priority: Priority) => {
+    setTasks(tasks.map((t) => (t.id === id ? { ...t, priority } : t)));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      addTask();
-    }
+    if (e.key === "Enter") addTask();
   };
 
+  const reachedMax = tasks.length >= MAX_TASKS;
+  const remaining = tasks.filter((t) => !t.completed).length;
+
   return (
-    <div className={styles.addTaskContainer} ref={taskContainerRef}>
-      <input
-        className={styles.inputAddTask}
-        type="text"
-        value={newTaskText}
-        onChange={(e) => setNewTaskText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Entrez votre tâche ici..."
-      />
-      <button onClick={addTask} className='addbutton' style={{ cursor: 'pointer', height: '30px', width: '30px', verticalAlign: 'middle', marginLeft: '26px' }}>
-        <FontAwesomeIcon icon={faPlus} style={{ width: '20px', height: '15px' }} />
-      </button>
+    <div className={styles.taskListWrap}>
+      <div className={styles.addRow}>
+        <input
+          className={styles.addInput}
+          type="text"
+          value={newTaskText}
+          onChange={(e) => setNewTaskText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={
+            reachedMax ? "Limite atteinte" : "Nouvelle tâche…"
+          }
+          disabled={reachedMax}
+        />
+        <button
+          type="button"
+          onClick={addTask}
+          className={styles.addBtn}
+          disabled={reachedMax || !newTaskText.trim()}
+          aria-label="Ajouter la tâche"
+        >
+          <FontAwesomeIcon icon={faPlus} />
+        </button>
+      </div>
 
-      <ul className={styles.taskList}>
-  {tasks.length >= MAX_TASKS && (
-    <li className={styles.taskItem}>
-      <span className={styles.errorMessage}>Vous avez atteint le nombre maximum de tâches.</span>
-    </li>
-  )}
-  {tasks.map(task => (
-    <li key={task.id} className={styles.taskItem} style={{ marginBottom: '10px' }}>
-      {editingTaskId === task.id ? (
-        <div style={{ marginTop: '5px' }}>
-          <input
-            type="text"
-            value={editingTaskText}
-            onChange={(e) => setEditingTaskText(e.target.value)}
-          />
-          <button onClick={saveEditedTask}>Enregistrer</button>
-          <button onClick={() => setEditingTaskId(null)}>Annuler</button>
-        </div>
+      {tasks.length === 0 ? (
+        <p className={styles.emptyState}>
+          Aucune tâche. Ajoute-en une ci-dessus.
+        </p>
       ) : (
-        <>
-          <span>{task.id}. {task.text}</span>
-
-          <div className={styles.taskButtons}>
-            <button onClick={() => editTask(task.id, task.text)}>
-              <FontAwesomeIcon icon={faEdit} style={{ cursor: 'pointer', width: '20px', height: '15px' }} />
-            </button>
-            <button onClick={() => deleteTask(task.id)}>
-              <FontAwesomeIcon icon={faTrash} style={{ cursor: 'pointer', width: '20px', height: '15px' }} />
-            </button>
-          </div>
-        </>
+        <ul className={styles.taskUl}>
+          {tasks.map((task, i) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              index={i}
+              onToggle={toggleTask}
+              onDelete={deleteTask}
+              onEdit={editTask}
+              onPriorityChange={setPriority}
+            />
+          ))}
+        </ul>
       )}
-    </li>
-  ))}
-</ul>
 
+      {tasks.length > 0 && (
+        <div className={styles.taskMeta}>
+          {remaining} sur {tasks.length} restante{remaining > 1 ? "s" : ""}
+        </div>
+      )}
     </div>
   );
-};
-
-export default TaskList;
+}

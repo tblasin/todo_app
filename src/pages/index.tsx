@@ -1,208 +1,308 @@
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
-import TaskList from '../../components/TaskList'; 
-import styles from '@/styles/Home.module.css'; 
+import React, { useEffect, useMemo, useState } from "react";
+import Head from "next/head";
+import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPlus,
+  faTrash,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
+import TaskList from "../../components/TaskList";
+import type { Task, TaskList as TaskListType } from "@/types/task";
+import {
+  createList,
+  defaultLists,
+  loadLists,
+  saveLists,
+} from "@/utils/storage";
+import styles from "@/styles/Home.module.css";
 
- 
-// Définition du type Task
-type Task = {
-  id: number;
-  text: string;
-};
+const BACKGROUNDS = [
+  "/images/backgrounds/morocco.jpg",
+  "/images/backgrounds/boreale.jpeg",
+  "/images/backgrounds/clouds.jpeg",
+  "/images/backgrounds/desert.jpeg",
+  "/images/backgrounds/underwater.jpeg",
+  "/images/backgrounds/butterfly.jpeg",
+  "/images/backgrounds/moon.webp",
+];
 
-// Composant de flèche personnalisée pour le carrousel suivant
-const SampleNextArrow: React.FC<any> = ({ onClick }) => (
-  <div className={styles.nextArrow} onClick={onClick}>
-    <FontAwesomeIcon icon={faChevronRight} />
-  </div>
-);
+const BACKGROUND_KEY = "todoApp:background";
 
-// Composant de flèche personnalisée pour le carrousel précédent
-const SamplePrevArrow: React.FC<any> = ({ onClick }) => (
-  <div className={styles.prevArrow} onClick={onClick}>
-    <FontAwesomeIcon icon={faChevronLeft} />
-  </div>
-);
-
-// Composant principal de l'application
-const Home: React.FC = () => {
-  const [activeList, setActiveList] = useState<number>(0); // État pour suivre la liste de tâches active
-  const [taskLists, setTaskLists] = useState<Array<{ title: string, tasks: Task[] }>>([
-    { title: '', tasks: [] },
-    { title: '', tasks: [] },
-    { title: '', tasks: [] },
-  ]);
-  const [backgroundImage, setBackgroundImage] = useState<string>('/images/backgrounds/morocco.jpg'); // Image de fond
-  const [containerHeight, setContainerHeight] = useState<number>(4);
-  
-
-  // Effet pour charger les données depuis le stockage local au chargement de la page
-  useEffect(() => {
-    const storedTaskLists = localStorage.getItem('taskLists');
-    if (storedTaskLists) {
-      setTaskLists(JSON.parse(storedTaskLists));
+function sanitizeLists(raw: TaskListType[]): TaskListType[] {
+  return raw.map((l) => {
+    const bg = l.backgroundImage;
+    if (bg != null && bg !== "" && BACKGROUNDS.includes(bg)) {
+      return { ...l, backgroundImage: bg };
     }
+    const { backgroundImage: _removed, ...rest } = l;
+    return rest as TaskListType;
+  });
+}
+
+const Home: React.FC = () => {
+  const [lists, setLists] = useState<TaskListType[]>(() => defaultLists());
+  const [activeId, setActiveId] = useState<string>("");
+  const [hydrated, setHydrated] = useState(false);
+  const [defaultBackground, setDefaultBackground] = useState<string>(BACKGROUNDS[0]);
+  const [bgPanelOpen, setBgPanelOpen] = useState(false);
+
+  useEffect(() => {
+    const loaded = loadLists();
+    const base = loaded.length > 0 ? loaded : defaultLists();
+    const safe = sanitizeLists(base);
+    setLists(safe);
+    setActiveId(safe[0].id);
+    const storedBg = window.localStorage.getItem(BACKGROUND_KEY);
+    if (storedBg && BACKGROUNDS.includes(storedBg)) {
+      setDefaultBackground(storedBg);
+    }
+    setHydrated(true);
   }, []);
 
-  // Effet pour sauvegarder les données dans le stockage local à chaque changement des listes de tâches
   useEffect(() => {
-    localStorage.setItem('taskLists', JSON.stringify(taskLists));
-  }, [taskLists]);
+    if (!hydrated) return;
+    saveLists(lists);
+  }, [lists, hydrated]);
 
-  // Mettre à jour la hauteur du conteneur
-  const updateContainerHeight = () => {
-    const activeTasks = taskLists[activeList].tasks.length;
-    setContainerHeight(4 + activeTasks * 2.5);
-  };
-
-  // Mettre à jour la hauteur du conteneur quand la liste des tâches change
   useEffect(() => {
-    updateContainerHeight();
-  }, [taskLists, activeList]);
+    if (!hydrated) return;
+    window.localStorage.setItem(BACKGROUND_KEY, defaultBackground);
+  }, [defaultBackground, hydrated]);
 
-  // Fonction pour gérer le changement de liste de tâches active lorsqu'un titre est cliqué
-  const handleListClick = (index: number) => {
-    setActiveList(index); // Mettre à jour l'état activeList avec l'index de la liste de tâches cliquée
-  };
+  const activeList = useMemo(
+    () => lists.find((l) => l.id === activeId) ?? lists[0],
+    [lists, activeId]
+  );
 
-  // Fonction pour mettre à jour le titre d'une liste de tâches
-  const handleTitleChange = (index: number, newTitle: string) => {
-    const updatedTaskLists = taskLists.map((list, i) => i === index ? { ...list, title: newTitle } : list);
-    setTaskLists(updatedTaskLists);
-  };
+  const effectiveBackground = useMemo(() => {
+    const override = activeList?.backgroundImage;
+    if (override && BACKGROUNDS.includes(override)) return override;
+    return defaultBackground;
+  }, [activeList, defaultBackground]);
 
-  // Fonction pour mettre à jour les tâches d'une liste de tâches
-  const handleTasksChange = (index: number, tasks: Task[]) => {
-    const updatedTaskLists = taskLists.map((list, i) => i === index ? { ...list, tasks } : list);
-    setTaskLists(updatedTaskLists);
-
-    updateContainerHeight();
-  };
-
-  // Fonction pour supprimer toutes les tâches de la liste active
-  const deleteAllTasks = () => {
-    const updatedTaskLists = taskLists.map((list, i) => i === activeList ? { ...list, tasks: [] } : list);
-    setTaskLists(updatedTaskLists);
-
-    updateContainerHeight();
-  };
-
-  // Configuration du carrousel
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
-    swipe: true,
-    touchMove: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          infinite: true,
+  const setBackgroundForActiveList = (bg: string) => {
+    if (!BACKGROUNDS.includes(bg)) return;
+    setLists((prev) =>
+      prev.map((l) => {
+        if (l.id !== activeId) return l;
+        if (bg === defaultBackground) {
+          const { backgroundImage: _r, ...rest } = l;
+          return rest as TaskListType;
         }
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
+        return { ...l, backgroundImage: bg };
+      })
+    );
+  };
+
+  const updateActiveTitle = (title: string) => {
+    setLists((prev) =>
+      prev.map((l) => (l.id === activeId ? { ...l, title } : l))
+    );
+  };
+
+  const updateActiveTasks = (tasks: Task[]) => {
+    setLists((prev) =>
+      prev.map((l) => (l.id === activeId ? { ...l, tasks } : l))
+    );
+  };
+
+  const addList = () => {
+    const newList = createList("");
+    setLists((prev) => [...prev, newList]);
+    setActiveId(newList.id);
+  };
+
+  const removeList = (id: string) => {
+    setLists((prev) => {
+      if (prev.length <= 1) return prev;
+      const next = prev.filter((l) => l.id !== id);
+      if (id === activeId) {
+        setActiveId(next[0].id);
       }
-    ]
+      return next;
+    });
   };
 
-  // Rendu du composant
+  const clearActiveTasks = () => {
+    if (!activeList || activeList.tasks.length === 0) return;
+    setLists((prev) =>
+      prev.map((l) => (l.id === activeId ? { ...l, tasks: [] } : l))
+    );
+  };
+
+  if (!activeList) return null;
+
   return (
     <>
       <Head>
-        <title>Todo-List App</title>
-        <meta name="description" content="Todo-List App" />
+        <title>DONE — Todo App</title>
+        <meta name="description" content="Application de gestion de tâches DONE" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main} style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
 
-        <h1 className={styles.title1}>DONE</h1>
-        <Image className="logogtd" src="/images/GTD.png" alt="Logo getting things done" width={115} height={30} />
-        {/* Entrées pour le titre de chaque liste */}
-        <div className={styles.buttons}>
-          {taskLists.map((list, index) => (
-            <div key={index} className={index === activeList ? styles.activeList : styles.clickableTitle} onClick={() => handleListClick(index)}>
-              {/* Afficher le titre de la liste de tâches */}
-              <input
-                type="text"
-                className={`${styles.titleInput} ${index === activeList ? styles.activeTitleInput : styles.inactiveTitleInput}`}
-                value={list.title}
-                placeholder={`Nommez Liste ${index + 1}`}
-                onChange={(e) => handleTitleChange(index, e.target.value)}
-              />
+      <div className={styles.pageRoot}>
+        <div
+          className={styles.bgLayer}
+          style={{ backgroundImage: `url(${effectiveBackground})` }}
+          aria-hidden
+        />
+        <div className={styles.bgOverlay} aria-hidden />
+
+        <main className={styles.main}>
+        <div className={styles.headerBar}>
+          <header className={styles.header}>
+            <div className={styles.brand}>
+              <span className={styles.brandTitle}>DONE</span>
+              <span className={styles.brandTagline}>Getting Things Done</span>
             </div>
-          ))}
-        </div>
-
-        {/* Conteneur de la liste de tâches active */}
-        <div className={styles.taskListContainer} style={{ height: `${containerHeight}rem` }}>
-          {/* Afficher la liste de tâches active en fonction de l'état activeList */}
-          <TaskList
-            listName={taskLists[activeList].title}
-            tasks={taskLists[activeList].tasks}
-            setTasks={(tasks) => handleTasksChange(activeList, tasks)}
-            updateContainerHeight={updateContainerHeight}
-          />
-        </div>
-
-        {/* Bouton pour supprimer toutes les tâches */}
-        <div className={styles.deleteButtonContainer}>
-          <button className={styles.deleteButton} onClick={deleteAllTasks}>
-            <FontAwesomeIcon icon={faTrash} className={styles.deleteIcon} />
+          </header>
+          <button
+            type="button"
+            className={styles.headerBtn}
+            onClick={() => setBgPanelOpen((v) => !v)}
+            aria-label="Personnaliser le fond"
+          >
+            <Image
+              src="/images/camera-icon.png"
+              alt=""
+              width={20}
+              height={20}
+              className={styles.headerBtnImg}
+            />
           </button>
         </div>
 
-        {/* Footer */}
-        <footer style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', textAlign: 'center', marginTop: '250px', color: 'white', fontSize: 'x-small' }}>
-        <div style={{ color: 'black'}}>
-          <p>&#123; Coded by : Creative Numerik &#125;</p>
-        </div><br /><br />
-          {/* Lien vers le site web */}
-          <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer">
-            <Image className="logo" src="/images/CreativeNumerik.png" alt="Logo de Creative Numerik" width={80} height={80} />
-          </a><br />
-          {/* Lien vers le site web avec le texte d'ancre */}
-          <a href="http://www.creativenumerik.com" target="_blank" rel="noopener noreferrer" className={styles.blackLink} >
-            www.creativenumerik.com
-          </a><br />
-
-          {/* Carrousel d'options de fond d'écran */}
-          <div className={styles.carousel}>
-            <Slider {...settings}>
-              {['/images/backgrounds/boreale.jpeg', '/images/backgrounds/clouds.jpeg', '/images/backgrounds/desert.jpeg', '/images/backgrounds/underwater.jpeg', '/images/backgrounds/morocco.jpg', '/images/backgrounds/butterfly.jpeg'].map((bg, index) => (
-                <div key={index} className={styles.backgroundOptionContainer}>
-                  <div
-                    className={styles.backgroundOption}
-                    style={{ backgroundImage: `url(${bg})` }}
-                    onClick={() => setBackgroundImage(bg)}
-                  ></div>
-                </div>
+        {bgPanelOpen && (
+          <section className={styles.bgPanel} role="dialog" aria-label="Choix du fond">
+            <header className={styles.bgPanelHeader}>
+              <div className={styles.bgPanelTitleBlock}>
+                <span>Fond d’écran</span>
+                <span className={styles.bgPanelHint}>
+                  Vous pouvez appliquer une image différente par liste.
+                </span>
+              </div>
+              <button
+                type="button"
+                className={`${styles.iconBtn} ${styles.bgPanelClose}`}
+                onClick={() => setBgPanelOpen(false)}
+                aria-label="Fermer"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </header>
+            <div className={styles.bgGrid}>
+              {BACKGROUNDS.map((bg) => (
+                <button
+                  type="button"
+                  key={bg}
+                  className={`${styles.bgThumb} ${
+                    bg === effectiveBackground ? styles.bgThumbActive : ""
+                  }`}
+                  style={{ backgroundImage: `url(${bg})` }}
+                  onClick={() => setBackgroundForActiveList(bg)}
+                  aria-label={`Appliquer le fond ${bg.split("/").pop()} à cette liste`}
+                />
               ))}
-            </Slider>
+            </div>
+          </section>
+        )}
+
+        <section className={styles.tabs} aria-label="Mes listes">
+          <div className={styles.tabsRow}>
+            {lists.map((list, i) => {
+              const isActive = list.id === activeId;
+              return (
+                <div
+                  key={list.id}
+                  className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
+                  onClick={() => setActiveId(list.id)}
+                >
+                  <input
+                    type="text"
+                    className={styles.tabInput}
+                    value={list.title}
+                    placeholder={`Liste ${i + 1}`}
+                    onFocus={() => setActiveId(list.id)}
+                    onChange={(e) => {
+                      if (isActive) updateActiveTitle(e.target.value);
+                      else
+                        setLists((prev) =>
+                          prev.map((l) =>
+                            l.id === list.id ? { ...l, title: e.target.value } : l
+                          )
+                        );
+                    }}
+                  />
+                  {lists.length > 1 && (
+                    <button
+                      type="button"
+                      className={styles.tabClose}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeList(list.id);
+                      }}
+                      aria-label="Supprimer la liste"
+                    >
+                      <FontAwesomeIcon icon={faXmark} />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+            <button
+              type="button"
+              className={styles.tabAdd}
+              onClick={addList}
+              aria-label="Nouvelle liste"
+              title="Nouvelle liste"
+            >
+              <FontAwesomeIcon icon={faPlus} />
+            </button>
           </div>
-         
+        </section>
+
+        <section className={styles.card}>
+          <TaskList
+            key={activeId}
+            tasks={activeList.tasks}
+            setTasks={updateActiveTasks}
+          />
+        </section>
+
+        <div className={styles.cardActions}>
+          <button
+            type="button"
+            className={styles.dangerBtn}
+            onClick={clearActiveTasks}
+            disabled={activeList.tasks.length === 0}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+            Vider la liste
+          </button>
+        </div>
+
+        <footer className={styles.footer}>
+          <a
+            href="http://www.creativenumerik.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.footerLink}
+          >
+            <Image
+              src="/images/CreativeNumerik.png"
+              alt="Logo Creative Numerik"
+              width={64}
+              height={64}
+            />
+            <span>www.creativenumerik.com</span>
+          </a>
         </footer>
-      </main>
+        </main>
+      </div>
     </>
   );
-}
+};
 
 export default Home;
